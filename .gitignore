@@ -1,0 +1,8 @@
+/data/
+/priceVolData/
+/venv/
+/tests/.hypothesis/
+/tests/.pytest_cache/
+/.hypothesis/
+/.ipynb_checkpoints/
+/.pytest_cache/
