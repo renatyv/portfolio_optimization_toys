@@ -9,10 +9,13 @@ from yahoo_fin import stock_info as yfsi
 import tqdm
 import numpy as np
 
+SHARES_OUTSTANDING_PATH = 'info/shares_outstanding.csv'
+DATA_DIR = 'priceVolData'
+
 SharesHistory = namedtuple('SharesHistory', ['price_history', 'volume_history', 'shares_outstanding'])
 
 def price_vol_path(ticker: str) -> str:
-    return 'priceVolData/' + ticker + '.csv'
+    return os.path.join(DATA_DIR,ticker+'.csv')
 
 
 def get_quote_type(ticker: str) -> Optional[str]:
@@ -101,20 +104,21 @@ def load_price_and_volume_histories(tickers: list[str]) -> tuple[pd.DataFrame, p
 
 
 def load_tickers(sample_size: int = 300) -> list[str]:
-    shares_outstanding = pd.read_csv('data/shares_outstanding.csv').dropna().sample(n=sample_size)
+    shares_outstanding = pd.read_csv(SHARES_OUTSTANDING_PATH).dropna().sample(n=sample_size)
     return shares_outstanding['ticker'].to_list()
 
 
-def load_shares_outstanding(tickers: list[str]) -> pd.Series:
+def load_shares_outstanding(tickers: list[str], path = SHARES_OUTSTANDING_PATH) -> pd.Series:
     """
     number of shares for each ticker
     :param tickers: list of tickers to load
     :return: pd.Series({'AMZN':10000.0, 'AAPL':12323000.0})
     """
-    tickers_df = pd.read_csv('data/shares_outstanding.csv', index_col='ticker').dropna().drop_duplicates(keep='first')
+    tickers_df = pd.read_csv(path, index_col='ticker').dropna().drop_duplicates(keep='first')
     selected_tickers = tickers_df.loc[tickers_df.index.isin(tickers), 'sharesOutstanding']
     not_laoded_tickers = [ticker for ticker in tickers if not (ticker in tickers_df.index)]
-    warnings.warn(f'ignored tickers: {not_laoded_tickers}')
+    if not_laoded_tickers:
+        warnings.warn(f'ignored tickers: {not_laoded_tickers}')
     return selected_tickers
 
 
@@ -126,3 +130,35 @@ def load_shares_history(tickers: list[str]) -> SharesHistory:
     shares_outstanding: pd.Series = load_shares_outstanding(tickers)
     prices_history_df, volumes_history_df = load_price_and_volume_histories(shares_outstanding.index.tolist())
     return SharesHistory(prices_history_df, volumes_history_df, shares_outstanding)
+
+
+def download_info(tickers: list[str]) -> pd.DataFrame:
+    """
+    :param tickers:
+    :return: DataFrame with columns 'ticker', 'sharesOutstanding', etc...
+    """
+    info_list = ['quoteType',
+                 'marketCap',
+                 'sharesOutstanding',
+                 'exchange',
+                 'bookValue',
+                 'longName',
+                 'shortName',
+                 'trailingPE',
+                 'trailingAnnualDividendYield']
+    tickers_info = dict()
+    tickers_info['ticker'] = []
+    for info_label in info_list:
+        tickers_info[info_label] = []
+    for ticker in tqdm.tqdm(tickers):
+        try:
+            ticker_info = yfsi.get_quote_data(ticker)
+        except (IndexError, AssertionError) as error:
+            print(f'{ticker} data is not downloaded')
+        else:
+            tickers_info['ticker'].append(ticker)
+            for info_label in info_list:
+                 tickers_info[info_label].append(ticker_info.get(info_label,None))
+    resulting_df = pd.DataFrame(tickers_info)
+    resulting_df.index.names = ['index']
+    return resulting_df

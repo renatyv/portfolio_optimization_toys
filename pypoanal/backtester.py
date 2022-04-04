@@ -5,16 +5,14 @@ import warnings
 from cvxpy import SolverError
 from pypfopt.exceptions import OptimizationError
 from scipy.sparse.linalg import ArpackNoConvergence
-
-import assets
-import pypoanal.portfolio_calculators as pcalc
 import numpy as np
 import pandas as pd
 import tqdm
 
-from dataloader import SharesHistory
-from assets import Portfolio
-from pypoanal import analyzer, rebalancer, dataloader
+from pypoanal import analyzer, rebalancer, dataloader, assets
+import pypoanal.portfolio_calculators as pcalc
+from pypoanal.assets import Portfolio
+from pypoanal.dataloader import SharesHistory
 
 
 def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.PortfolioWeightsCalculator,

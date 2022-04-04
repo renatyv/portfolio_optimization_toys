@@ -6,7 +6,7 @@ import pandas as pd
 import math
 from pypfopt import risk_models, EfficientFrontier, expected_returns, HRPOpt, DiscreteAllocation
 
-from assets import SharesWeights
+from pypoanal.assets import SharesWeights
 
 
 class PortfolioWeightsCalculator:

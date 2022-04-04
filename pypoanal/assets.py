@@ -8,6 +8,8 @@ SharesWeights = pd.Series  # pd.Series([0.2,0.3,0.5], index=['AMZN','GOOG','AAPL
 #  must be positive, short selling is not supported
 SharesNumber = SharesWeights  # pd.Series([1,12,3], index=['AMZN','GOOG','AAPL']), number of shares
 
+
+# should probably use dataclass instead
 Portfolio = namedtuple('Portfolio', ['cash', 'shares'])
 
 

@@ -1,8 +1,8 @@
 import numpy as np
 
 # from pypoanal import portfolio_calculators as pcalc
-import assets
-from assets import shares_value, Portfolio
+from pypoanal import assets
+from pypoanal.assets import shares_value, Portfolio
 from pypoanal.assets import SharesWeights
 from pypoanal.assets import SharesNumber
 from typing import Callable
@@ -43,30 +43,6 @@ def compute_rebalance_leftover(old_portfolio: Portfolio,
     old_portfolio_value = assets.portfolio_value(old_portfolio, latest_prices)
     fees = compute_rebalance_fees(old_portfolio.shares, rebalanced_shares, latest_prices, fees_percent)
     return old_portfolio_value - new_portfolio_value - fees
-
-
-def compute_weights(portfolio: SharesNumber,
-                    latest_prices: pd.Series) -> SharesWeights:
-    """
-    convert portfolio shares number to float weights
-    :param portfolio: pd.Series({'AMZN':100, 'GOOG':100})
-    :param latest_prices: pd.Series({'AMZN':1.2, 'GOOG':1.2})
-    :return: pd.Series({'AMZN':0.5, 'GOOG':0.5})
-    """
-    value = shares_value(portfolio, latest_prices)
-    # return {ticker: latest_prices[ticker]*portfolio[ticker]/value for ticker in portfolio}
-    return (latest_prices * portfolio / value).dropna()
-
-
-def portfolio_weights_distance(portfolio_w_1: SharesWeights,
-                               portfolio_w_2: SharesWeights) -> np.float64:
-    """
-    distance between two portfolio weights, sum(abs(w_1-w_2))
-    :param portfolio_w_1: pd.Series({'AMZN':0.3, 'GOOG':0.7})
-    :param portfolio_w_2: pd.Series({'AMZN':0.7, 'GOOG':0.3})
-    :return: 1.0
-    """
-    return portfolio_w_1.subtract(portfolio_w_2, fill_value=0.0).abs().sum()
 
 
 def reduce_portfolio_until_leftover_positive(portfolio: SharesNumber,

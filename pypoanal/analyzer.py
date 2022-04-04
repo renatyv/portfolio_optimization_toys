@@ -9,10 +9,9 @@ from pypfopt import risk_models
 from pypfopt.exceptions import OptimizationError
 from scipy.sparse.linalg import ArpackNoConvergence
 
-import assets
+from pypoanal import assets
 import pypoanal.portfolio_calculators as pcalc
 from pypoanal import dataloader
-from pypoanal.dataloader import load_price_volume_history
 import tqdm
 
 
