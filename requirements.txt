@@ -1,0 +1,8 @@
+hypothesis
+yfinance
+yahoo-fin
+pyportfolioopt
+numpy
+pandas
+jupyter
+tqdm

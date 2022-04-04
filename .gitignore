@@ -1,5 +1,6 @@
-/data/
-.DS_Store
+info/*.csv
+**/.DS_Store
+tests/.DS_Store
 /priceVolData/
 /venv/
 /tests/.hypothesis/
@@ -7,5 +8,6 @@
 /.hypothesis/
 /.ipynb_checkpoints/
 /.pytest_cache/
+/__pycache__/
 .idea
 .ipynb_checkpoints

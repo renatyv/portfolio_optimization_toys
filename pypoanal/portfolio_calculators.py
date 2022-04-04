@@ -1,9 +1,7 @@
-from typing import Callable
 import abc
 import warnings
 import numpy as np
 import pandas as pd
-import math
 from pypfopt import risk_models, EfficientFrontier, expected_returns, HRPOpt, DiscreteAllocation
 
 from pypoanal.assets import SharesWeights
