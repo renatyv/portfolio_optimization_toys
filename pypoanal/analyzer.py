@@ -54,10 +54,10 @@ def shares_weights_performance(weights: assets.SharesWeights,
     sigma = np.sqrt(weights_array.transpose() @ cov_matrix @ weights_array * frequency)
     initial_prices: np.ndarray = price_history_reduced.fillna(method='bfill').iloc[0]
     final_prices: np.ndarray = price_history_reduced.fillna(method='ffill').iloc[-1]
-    initial_portfolio_price = initial_prices @ weights_array
-    final_portfolio_price = final_prices @ weights_array
-    return_rate = (final_portfolio_price -
-                   initial_portfolio_price) / initial_portfolio_price
+    initial_shares_value = initial_prices @ weights_array
+    final_shares_value = final_prices @ weights_array
+    return_rate = (final_shares_value -
+                   initial_shares_value) / initial_shares_value
     return sigma, return_rate
 
 

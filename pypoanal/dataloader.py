@@ -9,7 +9,7 @@ from yahoo_fin import stock_info as yfsi
 import tqdm
 import numpy as np
 
-SHARES_OUTSTANDING_PATH = 'info/shares_outstanding.csv'
+SHARES_OUTSTANDING_FILEPATH = 'info/shares_outstanding.csv'
 DATA_DIR = 'priceVolData'
 
 SharesHistory = namedtuple('SharesHistory', ['price_history', 'volume_history', 'shares_outstanding'])

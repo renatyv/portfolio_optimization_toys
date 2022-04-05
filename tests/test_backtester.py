@@ -4,7 +4,7 @@ import pytest
 
 from pypoanal import backtester, portfolio_calculators
 
-@pytest.mark.skip
+# @pytest.mark.skip
 def test_backtest_MCAP():
     start_date = datetime.date(2009,5,10)
     backtest_end_date = datetime.date(2022, 1, 15)
@@ -38,7 +38,7 @@ def test_backtest_MCAP():
     assert len(values_df) > 0
 
 
-@pytest.mark.skip
+# @pytest.mark.skip
 def test_backtest_ECOV():
     start_date = datetime.date(2009,5,10)
     backtest_end_date = datetime.date(2022, 1, 15)

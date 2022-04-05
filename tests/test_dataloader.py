@@ -1,7 +1,5 @@
 import os
-
 import pandas as pd
-
 import dataloader
 import pypoanal.dataloader
 
@@ -44,6 +42,7 @@ def test_download_info_1():
     df = dataloader.download_info(['AAPL'])
     assert len(df[df['ticker'] == 'AAPL']) > 0
 
+
 def test_download_info_2():
     df = dataloader.download_info(['AAPL'])
-    assert df.loc[df['ticker'] == 'AAPL'].loc[:,'sharesOutstanding'].values[0] > 100
+    assert df.loc[df['ticker'] == 'AAPL'].loc[:, 'sharesOutstanding'].values[0] > 100
