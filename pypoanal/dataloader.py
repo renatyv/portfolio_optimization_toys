@@ -104,7 +104,7 @@ def load_price_and_volume_histories(tickers: set[str]) -> tuple[pd.DataFrame, pd
 
 
 def load_tickers(sample_size: int = 300) -> list[str]:
-    shares_outstanding = pd.read_csv(SHARES_OUTSTANDING_PATH).dropna().sample(n=sample_size)
+    shares_outstanding = pd.read_csv(SHARES_OUTSTANDING_FILEPATH).dropna().sample(n=sample_size)
     return shares_outstanding['ticker'].to_list()
 
 
@@ -114,7 +114,7 @@ def load_shares_outstanding(tickers: set[str]) -> pd.Series:
     :param tickers: list of tickers to load
     :return: pd.Series({'AMZN':10000.0, 'AAPL':12323000.0})
     """
-    tickers_df = pd.read_csv(path, index_col='ticker').dropna().drop_duplicates(keep='first')
+    tickers_df = pd.read_csv('info/shares_outstanding.csv', index_col='ticker').dropna().drop_duplicates(keep='first')
     selected_tickers = tickers_df.loc[tickers_df.index.isin(tickers), 'sharesOutstanding']
     # warn that some ticker are not loaded
     not_laoded_tickers = [ticker for ticker in tickers if not (ticker in tickers_df.index)]
