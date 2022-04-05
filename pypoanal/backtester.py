@@ -94,7 +94,7 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: list[
     """
     # load data
     if not shares_history:
-        shares_history = dataloader.load_shares_history(tickers)
+        shares_history = dataloader.load_shares_history(set(tickers))
     # init dataframes
     values_history_per_calc = pd.DataFrame(index=rebalance_dates)
     fees_history_per_calc = pd.DataFrame(index=rebalance_dates)

@@ -89,7 +89,7 @@ def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
     sample_start_dates = [start_date + datetime.timedelta(days=step_num * step_days) for step_num in range(num_steps)]
     # load data
     if not shares_history:
-        shares_history = dataloader.load_shares_history(tickers)
+        shares_history = dataloader.load_shares_history(set(tickers))
     prices_history_df, volumes_history_df, shares_outstanding = shares_history
     # init returned dataframes
     return_rates_df = pd.DataFrame(index=sample_start_dates)

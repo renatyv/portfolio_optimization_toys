@@ -87,7 +87,7 @@ def load_price_volume_history(ticker: str) -> pd.DataFrame:
         return price_volume_history
 
 
-def load_price_and_volume_histories(tickers: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_price_and_volume_histories(tickers: set[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     """ load all prices to a single table for analysis
     :return prices table indexed with dates, column = tickers, i.e. 'GOOG', 'AMZN',...
     :return volumes table indexed with dates, column = tickers, i.e. 'GOOG', 'AMZN',...
@@ -108,7 +108,7 @@ def load_tickers(sample_size: int = 300) -> list[str]:
     return shares_outstanding['ticker'].to_list()
 
 
-def load_shares_outstanding(tickers: list[str], path = SHARES_OUTSTANDING_PATH) -> pd.Series:
+def load_shares_outstanding(tickers: set[str]) -> pd.Series:
     """
     number of shares for each ticker
     :param tickers: list of tickers to load
@@ -116,19 +116,19 @@ def load_shares_outstanding(tickers: list[str], path = SHARES_OUTSTANDING_PATH) 
     """
     tickers_df = pd.read_csv(path, index_col='ticker').dropna().drop_duplicates(keep='first')
     selected_tickers = tickers_df.loc[tickers_df.index.isin(tickers), 'sharesOutstanding']
+    # warn that some ticker are not loaded
     not_laoded_tickers = [ticker for ticker in tickers if not (ticker in tickers_df.index)]
-    if not_laoded_tickers:
-        warnings.warn(f'ignored tickers: {not_laoded_tickers}')
+    warnings.warn(f'ignored tickers: {not_laoded_tickers}')
     return selected_tickers
 
 
-def load_shares_history(tickers: list[str]) -> SharesHistory:
+def load_shares_history(tickers: set[str]) -> SharesHistory:
     """
     :param tickers:
     :returns: price history, volumes history, outstanding shares
     """
     shares_outstanding: pd.Series = load_shares_outstanding(tickers)
-    prices_history_df, volumes_history_df = load_price_and_volume_histories(shares_outstanding.index.tolist())
+    prices_history_df, volumes_history_df = load_price_and_volume_histories(set(shares_outstanding.index.tolist()))
     return SharesHistory(prices_history_df, volumes_history_df, shares_outstanding)
 
 
