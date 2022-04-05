@@ -25,7 +25,8 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
     portfolio_history = [initial_portfolio]
     fees_history = [np.float64(0.0)]
     # parse price, volume, outstanding
-    price_history, volume_history, shares_outstanding = shares_history
+    price_history, volume_history, shares_outstanding = \
+        shares_history.price_history, shares_history.volume_history, shares_history.shares_outstanding
     # price history without NANs
     forward_filled_price_history = price_history.fillna(method='ffill')
     # backtest

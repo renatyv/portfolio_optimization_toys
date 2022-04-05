@@ -90,7 +90,8 @@ def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
     # load data
     if not shares_history:
         shares_history = dataloader.load_shares_history(set(tickers))
-    prices_history_df, volumes_history_df, shares_outstanding = shares_history
+    prices_history_df, volumes_history_df, shares_outstanding = \
+        shares_history.price_history, shares_history.volume_history, shares_history.shares_outstanding
     # init returned dataframes
     return_rates_df = pd.DataFrame(index=sample_start_dates)
     sigmas_df = pd.DataFrame(index=sample_start_dates)

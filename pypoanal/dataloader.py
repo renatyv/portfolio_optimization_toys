@@ -1,5 +1,6 @@
 import warnings
 from collections import namedtuple
+from dataclasses import dataclass
 from typing import Optional, NoReturn
 
 import pandas as pd
@@ -12,7 +13,13 @@ import numpy as np
 SHARES_OUTSTANDING_FILEPATH = 'info/shares_outstanding.csv'
 DATA_DIR = 'priceVolData'
 
-SharesHistory = namedtuple('SharesHistory', ['price_history', 'volume_history', 'shares_outstanding'])
+
+@dataclass
+class SharesHistory:
+    price_history: pd.DataFrame
+    volume_history: pd.DataFrame
+    shares_outstanding: pd.Series
+
 
 def price_vol_path(ticker: str) -> str:
     return os.path.join(DATA_DIR,ticker+'.csv')
