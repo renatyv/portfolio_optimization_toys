@@ -21,8 +21,7 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
                                       fees_percent: np.float64,
                                       shares_history: SharesHistory,
                                       progress_bar=True) -> tuple[list[assets.Portfolio], list[np.float64]]:
-    empty_shares = pd.Series()
-    initial_portfolio = Portfolio(initial_money, empty_shares)
+    initial_portfolio = Portfolio(cash=initial_money)
     portfolio_history = [initial_portfolio]
     fees_history = [np.float64(0.0)]
     # parse price, volume, outstanding
@@ -71,8 +70,7 @@ def portfolios_values_history(portfolio_history: list[tuple[datetime.date, asset
                               price_history: pd.DataFrame) -> list[np.float64]:
     forward_filled_prices = price_history.fillna(method='ffill')
     get_current_prices = lambda date: forward_filled_prices[:date].iloc[-1]
-    return [assets.portfolio_value(portfolio, get_current_prices(date))
-            for date, portfolio in portfolio_history]
+    return [portfolio.value(get_current_prices(date)) for date, portfolio in portfolio_history]
 
 
 def compare_calculators_for_periodic_rebalance(shares_weights_calculators: list[pcalc.PortfolioWeightsCalculator],
