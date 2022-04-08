@@ -9,5 +9,6 @@ tests/.DS_Store
 /.ipynb_checkpoints/
 /.pytest_cache/
 /__pycache__/
+/pypoanal/.ipynb_checkpoints
 .idea
 .ipynb_checkpoints

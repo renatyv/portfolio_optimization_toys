@@ -8,15 +8,22 @@
   * Market capitalization-weighted portfolio
   * Hierarchical Risk Parity
 
-## Downloading data
+## Downloading tikcers along with their info
 Package **yahoo_fin** is used to download list of tickers listed for S&P500, NYSE, and NASDAQ, see
 
-```download_ticker_data.ipynb```
+```download_ticker_info.ipynb```
 
-This jupyter notebook is used to download and save tickers along with some additional info (outstanding shares, full name, etc...) in .csv files in folder
+Download ticker price and volume history
 
-```info/```
+```download_price_history.ipynb```
 
+data is saved into ```info/```
+
+## Downloading price and volume historical data
+
+```analyze_portfolios.ipynb```
+
+Historical data for each ticker is saved into ```priceVolData/``` directory 
 
 
 

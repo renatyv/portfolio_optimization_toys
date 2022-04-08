@@ -22,7 +22,7 @@ class SharesHistory:
 
 
 def price_vol_path(ticker: str) -> str:
-    return os.path.join(DATA_DIR,ticker+'.csv')
+    return os.path.join(DATA_DIR, ticker+'.csv')
 
 
 def get_quote_type(ticker: str) -> Optional[str]:
