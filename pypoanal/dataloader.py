@@ -16,8 +16,11 @@ DATA_DIR = 'priceVolData'
 
 @dataclass
 class SharesHistory:
+    # DataFrame with Date as index, ticker as column name and ticker price as value
     price_history: pd.DataFrame
+    # DataFrame with Date as index, ticker as column name and ticker volume as value
     volume_history: pd.DataFrame
+    # DataSeries with ticker as index, adjusted shares outstanding as value
     shares_outstanding: pd.Series
 
 
@@ -35,14 +38,14 @@ def get_quote_type(ticker: str) -> Optional[str]:
     etc.
     """
     try:
-        quot_type = yfsi.get_quote_data(ticker).get('quoteType', None)
-        return quot_type
+        quote_type = yfsi.get_quote_data(ticker).get('quoteType', None)
+        return quote_type
     except IndexError:
         return None
 
 
 def download_price_volume_history(ticker: str, show_errors=True) -> pd.DataFrame:
-    """ Downloads ticker Adj Price and Volyme history from Yahoo Finance
+    """ Downloads ticker Adj Price and Volume history from Yahoo Finance
     Returns the corresponding pandas DataFrame object
     :param ticker: 'MSFT' or 'GOOG', etc...
     :return: dataframe with Date as index and two columns:
@@ -112,6 +115,7 @@ def load_price_and_volume_histories(tickers: set[str]) -> tuple[pd.DataFrame, pd
 
 
 def load_tickers(sample_size: int = 300) -> list[str]:
+    """Loads list of tickers from SharesOutstanding csv file"""
     shares_outstanding = pd.read_csv(SHARES_OUTSTANDING_FILEPATH).dropna().sample(n=sample_size)
     return shares_outstanding['ticker'].to_list()
 
@@ -141,7 +145,7 @@ def load_shares_history(tickers: set[str]) -> SharesHistory:
 
 
 def download_info(tickers: list[str]) -> pd.DataFrame:
-    """
+    """ downloads info for each ticker
     :param tickers:
     :return: DataFrame with columns 'ticker', 'sharesOutstanding', etc...
     """

@@ -17,19 +17,21 @@ import tqdm
 
 def choose_liquid_tickers(volumes_history: pd.DataFrame,
                           start_date: datetime.date,
-                          end_date: datetime.date) -> list[str]:
+                          end_date: datetime.date,
+                          min_volume=50,
+                          liquid_days_percent=90) -> list[str]:
     """
     | returns list of tickers, for whom:
-     more than MIN_VOLUME shares were traded for LIQUID_DAYS_PERCENT % of days in the specified period
+     more than min_volume shares were traded for liquid_days_percent % of days in the specified period
+     :param liquid_days_percent: minimal percent of days when ticker was trading
+     :param min_volume: USD volume
      :param volumes_history: trading volumes. DataFrame indexed with trading dates. Each column corresponds to a ticker
      """
-    MIN_VOLUME = 50  # shares
-    LIQUID_DAYS_PERCENT = 90  # % of trading days must have volume larger that MIN_VOLUME
     trading_days_in_period = len(volumes_history[start_date:end_date])
-    required_liquid_trading_days = trading_days_in_period * LIQUID_DAYS_PERCENT / 100.0
+    required_liquid_trading_days = trading_days_in_period * liquid_days_percent / 100.0
     volumes_sample = volumes_history.loc[start_date:end_date, :]
     # for each ticker compute number of days for which volume was higher that MIN_VOLUME
-    liquid_trading_days = volumes_sample.apply(lambda x: len(x.loc[x > MIN_VOLUME]), axis=0)
+    liquid_trading_days = volumes_sample.apply(lambda x: len(x.loc[x > min_volume]), axis=0)
     # choose tickers for which number of liquid days is more than required
     liquid_tickers = liquid_trading_days[liquid_trading_days > required_liquid_trading_days].index.tolist()
     return liquid_tickers
@@ -43,6 +45,7 @@ def shares_weights_performance(weights: assets.SharesWeights,
     return rate is the return rate for
     1) buying the portfolio on the first date of prices DafaFrame
     2) selling on the last day of prices DafaFrame
+    :param frequency: trading days per period (default 252 days, per year)
     :param weights: portfolio weights
     :param price_history: table indexed with dates, column of prices for tickets
     :returns sigma:, computed Covariance matrix using LW shrinkage
