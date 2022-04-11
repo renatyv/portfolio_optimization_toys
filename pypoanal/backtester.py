@@ -81,8 +81,8 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: list[
                                                fees_percent=np.float64(0.04),
                                                shares_history: SharesHistory = None,
                                                progress_bar: bool = True) -> tuple[pd.DataFrame,
-                                                                          pd.DataFrame,
-                                                                          dict[str, list[assets.Portfolio]]]:
+                                                                                   pd.DataFrame,
+                                                                                   dict[str, list[assets.Portfolio]]]:
     """
     :param tickers: list of used tickers
     :param shares_weights_calculators:
@@ -101,11 +101,11 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: list[
     for calculator in shares_weights_calculators:
         # init history
         portfolios, fees_history = reallocate_portfolio_periodically(calculator,
-                                                                            rebalance_dates,
-                                                                            initial_cash,
-                                                                            fees_percent,
-                                                                            shares_history,
-                                                                            progress_bar)
+                                                                     rebalance_dates,
+                                                                     initial_cash,
+                                                                     fees_percent,
+                                                                     shares_history,
+                                                                     progress_bar)
         # save to dataframes
         calc_name = str(calculator)
         portfolio_history_per_calc[calc_name] = portfolios

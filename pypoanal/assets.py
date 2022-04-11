@@ -12,6 +12,7 @@ SharesNumber = SharesWeights  # pd.Series([1,12,3], index=['AMZN','GOOG','AAPL']
 
 def shares_value(shares: SharesNumber, shares_prices: pd.Series) -> np.float64:
     """
+    returns dot product of shares number and shares prices
     :param shares_prices: pd.Series({'AMZN':200.0, 'GOOG':100.0})
     :param shares: pd.Series({'AMZN':1.0, 'GOOG':2.0})
     :return: 400.0

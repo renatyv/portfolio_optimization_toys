@@ -1,7 +1,5 @@
 import numpy as np
 
-# from pypoanal import portfolio_calculators as pcalc
-from pypoanal import assets
 from pypoanal.assets import shares_value, Portfolio
 from pypoanal.assets import SharesWeights
 from pypoanal.assets import SharesNumber
@@ -61,18 +59,18 @@ def reduce_portfolio_until_leftover_positive(shares: SharesNumber,
         return shares
     only_positive_shares = shares[shares > 0]
     price_sorted_tickers: pd.Series = only_positive_shares.sort_values(key=lambda ser: latest_prices[ser.index],
-                                                                    ascending=True)
+                                                                       ascending=True)
     leftover = leftover_fn(only_positive_shares)
     for ticker in price_sorted_tickers.index:
         if leftover < 0:
-            num_tickers = min(np.ceil(-leftover/latest_prices[ticker]),
+            num_tickers = min(np.ceil(-leftover / latest_prices[ticker]),
                               only_positive_shares[ticker])
             only_positive_shares[ticker] -= num_tickers
-            portfolio_value_change = num_tickers*latest_prices[ticker]
+            portfolio_value_change = num_tickers * latest_prices[ticker]
             # sold some shares
             leftover += portfolio_value_change
             # additional fees, worst case estimate
-            leftover -= portfolio_value_change*fees_percent/100.0
+            leftover -= portfolio_value_change * fees_percent / 100.0
         else:
             break
     return only_positive_shares
@@ -108,7 +106,7 @@ def reallocate_portfolio(old_portfolio: Portfolio,
 def allocate_discrete(portfolio_weights: SharesWeights,
                       latest_prices: pd.Series,
                       cash: np.float64,
-                      fees_percent=0.04) -> tuple[assets.Portfolio, np.float64]:
+                      fees_percent=0.04) -> tuple[Portfolio, np.float64]:
     """
     allocates portfolio with integer values
     :param potfolio_weights:
@@ -117,7 +115,7 @@ def allocate_discrete(portfolio_weights: SharesWeights,
     :param fees_percent:
     :return: Portfolio, fees
     """
-    return reallocate_portfolio(old_portfolio=assets.Portfolio(cash, pd.Series()),
+    return reallocate_portfolio(old_portfolio=Portfolio(cash, pd.Series()),
                                 new_portfolio_weights=portfolio_weights,
                                 latest_prices=latest_prices,
                                 fees_percent=fees_percent)

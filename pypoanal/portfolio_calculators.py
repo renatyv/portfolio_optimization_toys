@@ -23,6 +23,7 @@ class PortfolioWeightsCalculator:
 
 class MaxSharpeCalculator(PortfolioWeightsCalculator):
     """ mazimaize beta using LedoitWolf """
+
     def __str__(self):
         return 'max_sharpe'
 
@@ -36,7 +37,6 @@ class MaxSharpeCalculator(PortfolioWeightsCalculator):
         optimizer.max_sharpe(risk_free_rate=0.02)
         portfolio_weights = pd.Series(dict(optimizer.clean_weights()))
         return portfolio_weights
-
 
 
 class EqualWeightsCalculator(PortfolioWeightsCalculator):

@@ -107,7 +107,8 @@ def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
             test_prices_df = prices_history_df.loc[sample_end:test_end, liquid_tickers]
             try:
                 new_portfolio_weights = calculator.get_weights(shares_outstanding, sample_prices_df)
-            except (SolverError, OptimizationError, ArpackNoConvergence, ValueError) as anc: # ArpackNoConvergence for ledoit, ValueError for HRP
+            except (SolverError, OptimizationError, ArpackNoConvergence,
+                    ValueError) as anc:  # ArpackNoConvergence for ledoit, ValueError for HRP
                 warnings.warn(f'{str(anc)}')
                 sigma = np.nan
                 return_rate = np.nan

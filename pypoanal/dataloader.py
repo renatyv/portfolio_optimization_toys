@@ -22,7 +22,7 @@ class SharesHistory:
 
 
 def price_vol_path(ticker: str) -> str:
-    return os.path.join(DATA_DIR, ticker+'.csv')
+    return os.path.join(DATA_DIR, ticker + '.csv')
 
 
 def get_quote_type(ticker: str) -> Optional[str]:
@@ -50,6 +50,7 @@ def download_price_volume_history(ticker: str, show_errors=True) -> pd.DataFrame
     """
     price_volume_history = yf.download([ticker], period="max", progress=False, show_errors=show_errors, threads=False)
     return price_volume_history.drop(["Close", "Open", "Low", "High"], axis=1).dropna(how="all")
+
 
 def download_and_save_price_history(tickers_to_download: list[str]) -> list[str]:
     """ downloads prices for list of tickers to
@@ -79,14 +80,14 @@ def load_price_volume_history(ticker: str) -> pd.DataFrame:
     filepath = price_vol_path(ticker)
     if os.path.exists(filepath):
         price_volume_history = pd.read_csv(filepath,
-                                       parse_dates=['Date'],
-                                       index_col='Date',
-                                       dtype={'Adj Close':np.float64,
-                                              'Volume': np.float64,
-                                              'Close': np.float64,
-                                              'Open': np.float64,
-                                              'High': np.float64,
-                                              'Low': np.float64})
+                                           parse_dates=['Date'],
+                                           index_col='Date',
+                                           dtype={'Adj Close': np.float64,
+                                                  'Volume': np.float64,
+                                                  'Close': np.float64,
+                                                  'Open': np.float64,
+                                                  'High': np.float64,
+                                                  'Low': np.float64})
         return price_volume_history
     else:
         price_volume_history = download_price_volume_history(ticker)
@@ -165,7 +166,7 @@ def download_info(tickers: list[str]) -> pd.DataFrame:
         else:
             tickers_info['ticker'].append(ticker)
             for info_label in info_list:
-                 tickers_info[info_label].append(ticker_info.get(info_label,None))
+                tickers_info[info_label].append(ticker_info.get(info_label, None))
     resulting_df = pd.DataFrame(tickers_info)
     resulting_df.index.names = ['index']
     return resulting_df
