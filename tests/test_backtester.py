@@ -1,7 +1,5 @@
 import datetime
 
-import pytest
-
 from pypoanal import backtester, portfolio_calculators
 
 # @pytest.mark.skip
@@ -43,6 +41,7 @@ def test_backtest_ECOV():
     start_date = datetime.date(2009,5,10)
     backtest_end_date = datetime.date(2022, 1, 15)
     rebalance_period = datetime.timedelta(days=360)
+    # rebalance_dates = pd.date_range(start=start_date,end=backtest_end_date, freq=pd.tseries.offsets.DateOffset(months=12))
     rebalance_dates = backtester.compute_rebalance_dates(start_date,backtest_end_date,rebalance_period)
     initial_cash = 10 ** 4
     tickers_list = ['ABCL','ABGI','ACIW','ACNB','ADPT','AEAC','AEL','AERC','AFIB','AGI','AKAM','AKIC','AL','AM','AMH',
