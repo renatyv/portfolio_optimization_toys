@@ -1,6 +1,8 @@
 # python notebooks and small library for basic analysis of stocks
 I want to choose good portolio from list of available shares.
 My requirements are:
+
+0. Download historical price and volume data
 1. I do not want to re-allocate portfolio too often (at most 4 times a year)
 2. I want to backtest various portolio allocation strategies, i.e. test how they worked in the past.
 3. Fees need to be taken into account. Assume that fee is 0.02% for each operation (buy or sell)
@@ -12,7 +14,7 @@ I found several ways to compose a portfolio:
   * Market capitalization-weighted portfolio
   * Hierarchical Risk Parity
 
-### Example
+## Example
 The following graphs were obtained using the [analyze_portfolios.ipynb](analyze_portfolios.ipynb).
 
 0. We select randomly 50 shares, which we will work with.
@@ -30,7 +32,7 @@ Negative values of the portfolio mean that MCAP strategy works.
 
 It seems, that the HRP works a bit better for this example
 
-## Downloading tikcers along with their info
+## Downloading tickers along with their info
 Package **yahoo_fin** is used to download list of tickers listed for S&P500, NYSE, and NASDAQ, see
 
 ```download_ticker_info.ipynb```
