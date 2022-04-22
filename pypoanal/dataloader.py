@@ -1,7 +1,6 @@
 import warnings
-from collections import namedtuple
 from dataclasses import dataclass
-from typing import Optional, NoReturn
+from typing import Optional
 
 import pandas as pd
 import yfinance as yf
@@ -166,7 +165,7 @@ def download_info(tickers: list[str]) -> pd.DataFrame:
     for ticker in tqdm.tqdm(tickers):
         try:
             ticker_info = yfsi.get_quote_data(ticker)
-        except (IndexError, AssertionError) as error:
+        except (IndexError, AssertionError):
             print(f'{ticker} data is not downloaded')
         else:
             tickers_info['ticker'].append(ticker)

@@ -44,7 +44,7 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
         #     rebalance
         try:
             allocated_shares_weights = shares_weights_calculator.get_weights(shares_outstanding, prices_sample_df)
-        except (SolverError, OptimizationError, ArpackNoConvergence, ValueError) as error:
+        except (SolverError, OptimizationError, ArpackNoConvergence, ValueError):
             unallocated_dates.append(sample_start_date)
             allocated_portfolio = old_portfolio
             fees = 0

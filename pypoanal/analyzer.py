@@ -1,6 +1,5 @@
 import math
 import warnings
-from typing import Optional
 import datetime
 import pandas as pd
 import numpy as np
@@ -43,8 +42,8 @@ def shares_weights_performance(weights: assets.SharesWeights,
     """
     Sigma volatility is computed using Covariance matrix using LW shrinkage.
     return rate is the return rate for
-    1) buying the portfolio on the first date of prices DafaFrame
-    2) selling on the last day of prices DafaFrame
+    1) buying the portfolio on the first date of prices DataFrame
+    2) selling on the last day of prices DataFrame
     :param frequency: trading days per period (default 252 days, per year)
     :param weights: portfolio weights
     :param price_history: table indexed with dates, column of prices for tickets

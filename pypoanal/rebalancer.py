@@ -1,5 +1,3 @@
-import functools
-
 import numpy as np
 
 from pypoanal.assets import shares_value, Portfolio

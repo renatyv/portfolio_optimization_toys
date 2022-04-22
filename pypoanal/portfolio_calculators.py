@@ -2,10 +2,9 @@ import abc
 import warnings
 import numpy as np
 import pandas as pd
-from pypfopt import risk_models, EfficientFrontier, expected_returns, HRPOpt, DiscreteAllocation
+from pypfopt import risk_models, EfficientFrontier, expected_returns, HRPOpt
 
 from pypoanal.assets import SharesWeights
-
 
 
 class PortfolioWeightsCalculator:
