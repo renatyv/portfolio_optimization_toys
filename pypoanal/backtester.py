@@ -29,6 +29,7 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
         shares_history.price_history, shares_history.volume_history, shares_history.shares_outstanding
     # price history without NANs
     forward_filled_price_history = price_history.fillna(method='ffill')
+    unallocated_dates = []
     # backtest
     for sample_start_date, sample_end_date in zip(
             tqdm.tqdm(rebalance_dates[:-1], disable=not progress_bar, desc=str(shares_weights_calculator)),
@@ -44,7 +45,7 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
         try:
             allocated_shares_weights = shares_weights_calculator.get_weights(shares_outstanding, prices_sample_df)
         except (SolverError, OptimizationError, ArpackNoConvergence, ValueError) as error:
-            warnings.warn(f'{error} \n using old portfolio')
+            unallocated_dates.append(sample_start_date)
             allocated_portfolio = old_portfolio
             fees = 0
         else:
@@ -55,6 +56,8 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
         # save
         portfolio_history.append(allocated_portfolio)
         fees_history.append(fees)
+    if unallocated_dates:
+        warnings.warn(f'could not allocate portfolio for the dates {unallocated_dates}')
     return portfolio_history, fees_history
 
 

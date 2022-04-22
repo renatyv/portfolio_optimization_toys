@@ -130,7 +130,8 @@ def load_shares_outstanding(tickers: set[str]) -> pd.Series:
     selected_tickers = tickers_df.loc[tickers_df.index.isin(tickers), 'sharesOutstanding']
     # warn that some ticker are not loaded
     not_laoded_tickers = [ticker for ticker in tickers if not (ticker in tickers_df.index)]
-    warnings.warn(f'ignored tickers: {not_laoded_tickers}')
+    if not_laoded_tickers:
+        warnings.warn(f'ignored tickers: {not_laoded_tickers}')
     return selected_tickers
 
 

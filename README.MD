@@ -1,12 +1,34 @@
 # python notebooks and small library for basic analysis of stocks
+I want to choose good portolio from list of available shares.
+My requirements are:
+1. I do not want to re-allocate portfolio too often (at most 4 times a year)
+2. I want to backtest various portolio allocation strategies, i.e. test how they worked in the past.
+3. Fees need to be taken into account. Assume that fee is 0.02% for each operation (buy or sell)
 
-## Goals:
-* Compare methods for portfolio allocation:
+I found several ways to compose a portfolio:
   * Markovitz optimal portfolio (max Sharpie portfolio)
   * Using Ledoit Wolf caovariance shrinkage
   * Minimal volatility portfolio
   * Market capitalization-weighted portfolio
   * Hierarchical Risk Parity
+
+### Example
+The following graphs were obtained using the [analyze_portfolios.ipynb](analyze_portfolios.ipynb).
+
+0. We select randomly 50 shares, which we will work with.
+
+`['AXTA', 'TOL', 'FAF', 'BSET', 'SJT', 'PHT', 'ITT', 'SNY', 'MHN',
+       'ESE', 'TGLS', 'IMKTA', 'FIS', 'MYD', 'EVT', 'MDT', 'HRB', 'TY', 'NEP', 'AMAT', 'AGIO', 'TTEK', 'APA', 'VMC', 'FELE', 'GLW', 'PLBC', 'HLT', 'MGU', 'BKEPP', 'NUV', 'OMI', 'FBIZ', 'AVK', 'CRT', 'KR', 'USPH', 'OSBC', 'FMS', 'SYF', 'NIM', 'BKR', 'DFS', 'WSFS', 'FCX', 'RGLD', 'AFYA', 'EFC', 'AMCX', 'RLGY'])`
+1. Assume that we have $10M in cash and an empty portfolio at 2010-8-8.
+2. Then we compute portfolio value for each strategy: MCAP, min volatility with Ledoit-Wolf covariance shrinkage, and HRP.
+3. We randomize the start date. In this example 40 random dates were generated whithin interval [2006-8-8,2014-8-8].
+For each of the starting date the annual portfolio allocation procedure was restarted.
+
+In the end we compute the difference from the MCAP strategy to the Ledoit-Wolf and HRP ones (upper picture for Ledoit Wolf minimal volatility portfolios, and lower for HRP):
+![simulation results](docs/hrp_vs_ledoit_vs_mcap.png)
+Negative values of the portfolio mean that MCAP strategy works.
+
+It seems, that the HRP works a bit better for this example
 
 ## Downloading tikcers along with their info
 Package **yahoo_fin** is used to download list of tickers listed for S&P500, NYSE, and NASDAQ, see
@@ -24,6 +46,3 @@ data is saved into ```info/```
 ```analyze_portfolios.ipynb```
 
 Historical data for each ticker is saved into ```priceVolData/``` directory 
-
-
-

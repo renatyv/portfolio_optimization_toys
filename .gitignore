@@ -8,7 +8,7 @@ tests/.DS_Store
 /.hypothesis/
 /.ipynb_checkpoints/
 /.pytest_cache/
-/__pycache__/
+__pycache__/
 /pypoanal/.ipynb_checkpoints
 .idea
 .ipynb_checkpoints

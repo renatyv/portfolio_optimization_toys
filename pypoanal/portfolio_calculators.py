@@ -7,6 +7,7 @@ from pypfopt import risk_models, EfficientFrontier, expected_returns, HRPOpt, Di
 from pypoanal.assets import SharesWeights
 
 
+
 class PortfolioWeightsCalculator:
     @staticmethod
     @abc.abstractmethod
