@@ -9,10 +9,9 @@ import numpy as np
 import pandas as pd
 import tqdm
 
-from pypoanal import analyzer, rebalancer, dataloader, assets
+from pypoanal import rebalancer, dataloader
+from pypoanal.assets import Portfolio, SharesHistory
 import pypoanal.portfolio_calculators as pcalc
-from pypoanal.assets import Portfolio
-from pypoanal.dataloader import SharesHistory
 
 
 def reallocate_portfolio_periodically(compute_weights: pcalc.PortfolioWeightsCalculator,
@@ -20,7 +19,7 @@ def reallocate_portfolio_periodically(compute_weights: pcalc.PortfolioWeightsCal
                                       initial_money: np.float64,
                                       fees_percent: np.float64,
                                       shares_history: SharesHistory,
-                                      progress_bar=True) -> tuple[list[assets.Portfolio], list[np.float64]]:
+                                      progress_bar=True) -> tuple[list[Portfolio], list[np.float64]]:
     initial_portfolio = Portfolio(cash=initial_money)
     portfolio_history = [initial_portfolio]
     fees_history = [np.float64(0.0)]
@@ -37,8 +36,8 @@ def reallocate_portfolio_periodically(compute_weights: pcalc.PortfolioWeightsCal
         # load previous values
         old_portfolio = portfolio_history[-1]
         # slice and prepare data
-        liquid_tickers: list[str] = analyzer.choose_liquid_tickers(volume_history, sample_start_date,
-                                                                   sample_end_date)
+        liquid_tickers: list[str] = choose_liquid_tickers(volume_history, sample_start_date,
+                                                          sample_end_date)
         prices_sample_df = price_history.loc[sample_start_date:sample_end_date, liquid_tickers]
         prices_at_sample_end = forward_filled_price_history[:sample_end_date].iloc[-1]
         #     rebalance
@@ -70,7 +69,7 @@ def compute_rebalance_dates(start_date: datetime.date,
     return rebalance_dates
 
 
-def portfolios_values_history(portfolio_history: list[tuple[datetime.date, assets.Portfolio]],
+def portfolios_values_history(portfolio_history: list[tuple[datetime.date, Portfolio]],
                               price_history: pd.DataFrame) -> list[np.float64]:
     forward_filled_prices = price_history.fillna(method='ffill')
     get_current_prices = lambda date: forward_filled_prices[:date].iloc[-1]
@@ -85,7 +84,7 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: dict[
                                                shares_history: SharesHistory = None,
                                                progress_bar: bool = True) -> tuple[pd.DataFrame,
                                                                                    pd.DataFrame,
-                                                                                   dict[str, list[assets.Portfolio]]]:
+                                                                                   dict[str, list[Portfolio]]]:
     """
     :param tickers: list of used tickers
     :param shares_weights_calculators:
@@ -116,3 +115,25 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: dict[
         values_history_per_calc[calc_name] = portfolios_values_history(list(zip(rebalance_dates, portfolios)),
                                                                        shares_history.price_history)
     return values_history_per_calc, fees_history_per_calc, portfolio_history_per_calc
+
+
+def choose_liquid_tickers(volumes_history: pd.DataFrame,
+                          start_date: datetime.date,
+                          end_date: datetime.date,
+                          min_volume=50,
+                          liquid_days_percent=90) -> list[str]:
+    """
+    | returns list of tickers, for whom:
+     more than min_volume shares were traded for liquid_days_percent % of days in the specified period
+     :param liquid_days_percent: minimal percent of days when ticker was trading
+     :param min_volume: USD volume
+     :param volumes_history: trading volumes. DataFrame indexed with trading dates. Each column corresponds to a ticker
+     """
+    trading_days_in_period = len(volumes_history[start_date:end_date])
+    required_liquid_trading_days = trading_days_in_period * liquid_days_percent / 100.0
+    volumes_sample = volumes_history.loc[start_date:end_date, :]
+    # for each ticker compute number of days for which volume was higher that MIN_VOLUME
+    liquid_trading_days = volumes_sample.apply(lambda x: len(x.loc[x > min_volume]), axis=0)
+    # choose tickers for which number of liquid days is more than required
+    liquid_tickers = liquid_trading_days[liquid_trading_days > required_liquid_trading_days].index.tolist()
+    return liquid_tickers

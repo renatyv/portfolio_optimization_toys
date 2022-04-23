@@ -30,3 +30,13 @@ class Portfolio:
         :return: 500.0
         """
         return self.cash + shares_value(self.shares, shares_prices)
+
+
+@dataclass
+class SharesHistory:
+    # DataFrame with Date as index, ticker as column name and ticker price as value
+    price_history: pd.DataFrame
+    # DataFrame with Date as index, ticker as column name and ticker volume as value
+    volume_history: pd.DataFrame
+    # DataSeries with ticker as index, adjusted shares outstanding as value
+    shares_outstanding: pd.Series

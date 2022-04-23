@@ -1,8 +1,6 @@
 import numpy as np
 
-from pypoanal.assets import shares_value, Portfolio
-from pypoanal.assets import SharesWeights
-from pypoanal.assets import SharesNumber
+from pypoanal.assets import shares_value, Portfolio, SharesWeights, SharesNumber
 from typing import Callable
 import pandas as pd
 

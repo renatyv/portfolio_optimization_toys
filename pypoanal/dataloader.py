@@ -1,5 +1,4 @@
 import warnings
-from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
@@ -9,18 +8,10 @@ from yahoo_fin import stock_info as yfsi
 import tqdm
 import numpy as np
 
+from pypoanal.assets import SharesHistory
+
 SHARES_OUTSTANDING_FILEPATH = 'info/shares_outstanding.csv'
 DATA_DIR = 'priceVolData'
-
-
-@dataclass
-class SharesHistory:
-    # DataFrame with Date as index, ticker as column name and ticker price as value
-    price_history: pd.DataFrame
-    # DataFrame with Date as index, ticker as column name and ticker volume as value
-    volume_history: pd.DataFrame
-    # DataSeries with ticker as index, adjusted shares outstanding as value
-    shares_outstanding: pd.Series
 
 
 def price_vol_path(ticker: str) -> str:
