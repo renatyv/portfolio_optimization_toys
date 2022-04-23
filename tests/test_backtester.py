@@ -27,11 +27,8 @@ def test_backtest_MCAP():
      'STLD','SU','SVRA','SYBT','TASK','TDC','TKC','TOL','TOWN','TPTX','TRVI','TS','TSI','TURN','TXG','UIS',
      'UPS','USAP','VC','VEON','VFF','VIPS','VPG','VRA','VTN','WABC','WASH','WATT','WEN','WFC','WHLR','WILC',
      'WMS','WORX','WSM','WY','XELA','XRX','XTLB','YELL','YMAB','ZEAL','ZG','ZM','ZYXI']
-    # calculators = [portfolio_calculators.MCAPWeightsCalculator(),
-    #                portfolio_calculators.LedoitWolfWeightsCalculator(),
-    #                portfolio_calculators.ExpCovWeightsCalculator(),
-    #                portfolio_calculators.HRPWeightsCalculator()]
-    values_df, _, _ = backtester.compare_calculators_for_periodic_rebalance([portfolio_calculators.MCAPWeightsCalculator()], tickers_list,
+    calculators = {'MCAP': portfolio_calculators.mcap_weights}
+    values_df, _, _ = backtester.compare_calculators_for_periodic_rebalance(calculators, tickers_list,
                                                                             initial_cash, rebalance_dates, progress_bar=True)
     assert len(values_df) > 0
 
@@ -62,11 +59,8 @@ def test_backtest_ECOV():
      'STLD','SU','SVRA','SYBT','TASK','TDC','TKC','TOL','TOWN','TPTX','TRVI','TS','TSI','TURN','TXG','UIS',
      'UPS','USAP','VC','VEON','VFF','VIPS','VPG','VRA','VTN','WABC','WASH','WATT','WEN','WFC','WHLR','WILC',
      'WMS','WORX','WSM','WY','XELA','XRX','XTLB','YELL','YMAB','ZEAL','ZG','ZM','ZYXI']
-    # calculators = [portfolio_calculators.MCAPWeightsCalculator(),
-    #                portfolio_calculators.LedoitWolfWeightsCalculator(),
-    #                portfolio_calculators.ExpCovWeightsCalculator(),
-    #                portfolio_calculators.HRPWeightsCalculator()]
-    values_df, _, _ = backtester.compare_calculators_for_periodic_rebalance([portfolio_calculators.ExpCovWeightsCalculator()],
+    calculators = {'ECOV': portfolio_calculators.expcov_weights}
+    values_df, _, _ = backtester.compare_calculators_for_periodic_rebalance(calculators,
                                                                             tickers_list,
                                                                             initial_cash,
                                                                             rebalance_dates,

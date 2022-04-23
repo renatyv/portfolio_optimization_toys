@@ -64,7 +64,7 @@ def shares_weights_performance(weights: assets.SharesWeights,
 
 
 # use backtester to compute rolling performance
-def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
+def rolling_performance(calculators: dict[str, pcalc.PortfolioWeightsCalculator],
                         tickers: list[str],
                         start_date: datetime.date = datetime.date(2012, 1, 1),
                         end_date: datetime.date = datetime.date.today(),
@@ -97,8 +97,7 @@ def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
     # init returned dataframes
     return_rates_df = pd.DataFrame(index=sample_start_dates)
     sigmas_df = pd.DataFrame(index=sample_start_dates)
-    for calculator in calculators:
-        print(calculator)
+    for calculator_name, compute_weights in calculators.items():
         sigmas = []
         return_rates = []
         for sample_start in tqdm.tqdm(sample_start_dates):
@@ -108,7 +107,7 @@ def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
             sample_prices_df = prices_history_df.loc[sample_start:sample_end, liquid_tickers]
             test_prices_df = prices_history_df.loc[sample_end:test_end, liquid_tickers]
             try:
-                new_portfolio_weights = calculator.get_weights(shares_outstanding, sample_prices_df)
+                new_portfolio_weights = compute_weights(shares_outstanding, sample_prices_df)
             except (SolverError, OptimizationError, ArpackNoConvergence,
                     ValueError) as anc:  # ArpackNoConvergence for ledoit, ValueError for HRP
                 warnings.warn(f'{str(anc)}')
@@ -120,7 +119,6 @@ def rolling_performance(calculators: list[pcalc.PortfolioWeightsCalculator],
             sigmas.append(sigma)
             return_rates.append(return_rate)
         # Put results into dataframe
-        calc_name = str(calculator)
-        return_rates_df[calc_name] = return_rates
-        sigmas_df[calc_name] = sigmas
+        return_rates_df[calculator_name] = return_rates
+        sigmas_df[calculator_name] = sigmas
     return return_rates_df, sigmas_df

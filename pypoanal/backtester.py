@@ -15,7 +15,7 @@ from pypoanal.assets import Portfolio
 from pypoanal.dataloader import SharesHistory
 
 
-def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.PortfolioWeightsCalculator,
+def reallocate_portfolio_periodically(compute_weights: pcalc.PortfolioWeightsCalculator,
                                       rebalance_dates: list[datetime.date],
                                       initial_money: np.float64,
                                       fees_percent: np.float64,
@@ -32,7 +32,7 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
     unallocated_dates = []
     # backtest
     for sample_start_date, sample_end_date in zip(
-            tqdm.tqdm(rebalance_dates[:-1], disable=not progress_bar, desc=str(shares_weights_calculator)),
+            tqdm.tqdm(rebalance_dates[:-1], disable=not progress_bar),
             rebalance_dates[1:]):  # tqdm(zip(,)) does not draw progress bar
         # load previous values
         old_portfolio = portfolio_history[-1]
@@ -43,7 +43,7 @@ def reallocate_portfolio_periodically(shares_weights_calculator: pcalc.Portfolio
         prices_at_sample_end = forward_filled_price_history[:sample_end_date].iloc[-1]
         #     rebalance
         try:
-            allocated_shares_weights = shares_weights_calculator.get_weights(shares_outstanding, prices_sample_df)
+            allocated_shares_weights = compute_weights(shares_outstanding, prices_sample_df)
         except (SolverError, OptimizationError, ArpackNoConvergence, ValueError):
             unallocated_dates.append(sample_start_date)
             allocated_portfolio = old_portfolio
@@ -77,7 +77,7 @@ def portfolios_values_history(portfolio_history: list[tuple[datetime.date, asset
     return [portfolio.value(get_current_prices(date)) for date, portfolio in portfolio_history]
 
 
-def compare_calculators_for_periodic_rebalance(shares_weights_calculators: list[pcalc.PortfolioWeightsCalculator],
+def compare_calculators_for_periodic_rebalance(shares_weights_calculators: dict[str, pcalc.PortfolioWeightsCalculator],
                                                tickers: list[str],
                                                initial_cash: np.float64,
                                                rebalance_dates: list[datetime.date],
@@ -101,16 +101,16 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: list[
     values_history_per_calc = pd.DataFrame(index=rebalance_dates)
     fees_history_per_calc = pd.DataFrame(index=rebalance_dates)
     portfolio_history_per_calc = dict()
-    for calculator in shares_weights_calculators:
+    for calc_name, compute_weight in shares_weights_calculators.items():
         # init history
-        portfolios, fees_history = reallocate_portfolio_periodically(calculator,
+        print(calc_name)
+        portfolios, fees_history = reallocate_portfolio_periodically(compute_weight,
                                                                      rebalance_dates,
                                                                      initial_cash,
                                                                      fees_percent,
                                                                      shares_history,
                                                                      progress_bar)
         # save to dataframes
-        calc_name = str(calculator)
         portfolio_history_per_calc[calc_name] = portfolios
         fees_history_per_calc[calc_name] = fees_history
         values_history_per_calc[calc_name] = portfolios_values_history(list(zip(rebalance_dates, portfolios)),
