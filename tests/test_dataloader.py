@@ -46,3 +46,8 @@ def test_download_info_1():
 def test_download_info_2():
     df = dataloader.download_info(['AAPL'])
     assert df.loc[df['ticker'] == 'AAPL'].loc[:, 'sharesOutstanding'].values[0] > 100
+
+
+def test_load_shares_outstanding():
+    shares_ser = dataloader.load_shares_outstanding(['AAPL','GOOG','F'])
+    assert len(shares_ser) == 3

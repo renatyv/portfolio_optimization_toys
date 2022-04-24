@@ -27,7 +27,7 @@ def test_backtest_MCAP():
      'STLD','SU','SVRA','SYBT','TASK','TDC','TKC','TOL','TOWN','TPTX','TRVI','TS','TSI','TURN','TXG','UIS',
      'UPS','USAP','VC','VEON','VFF','VIPS','VPG','VRA','VTN','WABC','WASH','WATT','WEN','WFC','WHLR','WILC',
      'WMS','WORX','WSM','WY','XELA','XRX','XTLB','YELL','YMAB','ZEAL','ZG','ZM','ZYXI']
-    calculators = {'MCAP': portfolio_calculators.mcap_weights}
+    calculators = {'MCAP': portfolio_calculators.compute_mcap_weights}
     values_df, _, _ = backtester.compare_calculators_for_periodic_rebalance(calculators, tickers_list,
                                                                             initial_cash, rebalance_dates, progress_bar=True)
     assert len(values_df) > 0
@@ -59,7 +59,7 @@ def test_backtest_ECOV():
      'STLD','SU','SVRA','SYBT','TASK','TDC','TKC','TOL','TOWN','TPTX','TRVI','TS','TSI','TURN','TXG','UIS',
      'UPS','USAP','VC','VEON','VFF','VIPS','VPG','VRA','VTN','WABC','WASH','WATT','WEN','WFC','WHLR','WILC',
      'WMS','WORX','WSM','WY','XELA','XRX','XTLB','YELL','YMAB','ZEAL','ZG','ZM','ZYXI']
-    calculators = {'ECOV': portfolio_calculators.expcov_weights}
+    calculators = {'ECOV': portfolio_calculators.compute_expcov_weights}
     values_df, _, _ = backtester.compare_calculators_for_periodic_rebalance(calculators,
                                                                             tickers_list,
                                                                             initial_cash,

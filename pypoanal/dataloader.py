@@ -10,7 +10,7 @@ import numpy as np
 
 from pypoanal.assets import SharesHistory
 
-SHARES_OUTSTANDING_FILEPATH = 'info/shares_outstanding.csv'
+SHARES_INFO_FILEPATH = 'info/tickers_info.csv'
 DATA_DIR = 'priceVolData'
 
 
@@ -104,10 +104,21 @@ def load_price_and_volume_histories(tickers: set[str]) -> tuple[pd.DataFrame, pd
     return prices_history, volume_history
 
 
-def load_tickers(sample_size: int = 300) -> list[str]:
+def load_random_saved_tickers(sample_size: int = 300) -> list[str]:
     """Loads list of tickers from SharesOutstanding csv file"""
-    shares_outstanding = pd.read_csv(SHARES_OUTSTANDING_FILEPATH).dropna().sample(n=sample_size)
-    return shares_outstanding['ticker'].to_list()
+    return load_all_saved_tickers_info().sample(n=sample_size).index.to_list()
+
+
+def load_all_saved_tickers_info() -> pd.DataFrame:
+    """Load from file"""
+    tickers_info_df = pd.read_csv(SHARES_INFO_FILEPATH). \
+        dropna(subset=['sharesOutstanding']).\
+        drop_duplicates(subset=['ticker'], keep='first').\
+        set_index('ticker')
+    # tickers_info_df = pd.read_csv(SHARES_OUTSTANDING_FILEPATH, index_col='ticker').\
+    #     dropna(subset=['sharesOutstanding'])
+    # remove_duplicate_indexes_inplace(tickers_info_df)
+    return tickers_info_df
 
 
 def load_shares_outstanding(tickers: set[str]) -> pd.Series:
@@ -116,7 +127,7 @@ def load_shares_outstanding(tickers: set[str]) -> pd.Series:
     :param tickers: list of tickers to load
     :return: pd.Series({'AMZN':10000.0, 'AAPL':12323000.0})
     """
-    tickers_df = pd.read_csv('info/shares_outstanding.csv', index_col='ticker').dropna().drop_duplicates(keep='first')
+    tickers_df = load_all_saved_tickers_info()
     selected_tickers = tickers_df.loc[tickers_df.index.isin(tickers), 'sharesOutstanding']
     # warn that some ticker are not loaded
     not_laoded_tickers = [ticker for ticker in tickers if not (ticker in tickers_df.index)]
