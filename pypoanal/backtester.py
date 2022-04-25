@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import tqdm
 
-from pypoanal import rebalancer, dataloader
+from pypoanal import portfolio_rebalancer, dataloader
 from pypoanal.assets import Portfolio, SharesHistory
 import pypoanal.portfolio_calculators as pcalc
 
@@ -48,10 +48,10 @@ def reallocate_portfolio_periodically(compute_weights: pcalc.PortfolioWeightsCal
             allocated_portfolio = old_portfolio
             fees = 0
         else:
-            allocated_portfolio, fees = rebalancer.reallocate_portfolio(old_portfolio,
-                                                                        allocated_shares_weights,
-                                                                        prices_at_sample_end,
-                                                                        fees_percent=fees_percent)
+            allocated_portfolio, fees = portfolio_rebalancer.reallocate_portfolio(old_portfolio,
+                                                                                  allocated_shares_weights,
+                                                                                  prices_at_sample_end,
+                                                                                  fees_percent=fees_percent)
         # save
         portfolio_history.append(allocated_portfolio)
         fees_history.append(fees)
@@ -89,9 +89,12 @@ def compare_calculators_for_periodic_rebalance(shares_weights_calculators: dict[
     :param tickers: list of used tickers
     :param shares_weights_calculators:
     :param rebalance_dates: [2010-10-10,2011-10-10], first date --- start of the backtest
-    :return: table of portfolio values in USD (shares + cash), indexed with Dates, columns = calculators = 'MCAP', 'equal', 'exp_cov'
-    :return: table of rebalance fees in USD, indexed with Dates, columns = calculators = "MCAP", "equal", "exp_cov'
-    :return: portfolios_history over time: {'MCAP': [(100.0,{'GOOG':1.0, 'AMZN': 1.0}), (10.12,{'GOOG':2.0, 'AMZN': 2.0})], 'equal':[]}
+    :return: table of portfolio values in USD (shares + cash),
+    indexed with Dates, columns = calculators = 'MCAP', 'equal', 'exp_cov'
+    :return: table of rebalance fees in USD,
+    indexed with Dates, columns = calculators = "MCAP", "equal", "exp_cov'
+    :return: portfolios_history over time
+    example {'MCAP': [(100.0,{'GOOG':1.0, 'AMZN': 1.0}), (10.12,{'GOOG':2.0, 'AMZN': 2.0})], 'equal':[]}
     """
     # load data
     if not shares_history:

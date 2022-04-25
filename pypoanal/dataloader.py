@@ -14,7 +14,7 @@ SHARES_INFO_FILEPATH = 'info/tickers_info.csv'
 DATA_DIR = 'priceVolData'
 
 
-def price_vol_path(ticker: str) -> str:
+def _price_vol_path(ticker: str) -> str:
     return os.path.join(DATA_DIR, ticker + '.csv')
 
 
@@ -34,7 +34,7 @@ def get_quote_type(ticker: str) -> Optional[str]:
         return None
 
 
-def download_price_volume_history(ticker: str, show_errors=True) -> pd.DataFrame:
+def _download_price_volume_history(ticker: str, show_errors=True) -> pd.DataFrame:
     """ Downloads ticker Adj Price and Volume history from Yahoo Finance
     Returns the corresponding pandas DataFrame object
     :param ticker: 'MSFT' or 'GOOG', etc...
@@ -53,9 +53,9 @@ def download_and_save_price_history(tickers_to_download: list[str]) -> list[str]
     tickers_failed_to_download = []
     for ticker in tqdm.tqdm(tickers_to_download):
         try:
-            price_and_volume_df = download_price_volume_history(ticker, show_errors=False)
+            price_and_volume_df = _download_price_volume_history(ticker, show_errors=False)
             if len(price_and_volume_df) > 0:
-                price_and_volume_df.to_csv(price_vol_path(ticker))
+                price_and_volume_df.to_csv(_price_vol_path(ticker))
             else:
                 tickers_failed_to_download.append(ticker)
         except Exception as e:
@@ -64,13 +64,13 @@ def download_and_save_price_history(tickers_to_download: list[str]) -> list[str]
     return tickers_failed_to_download
 
 
-def load_price_volume_history(ticker: str) -> pd.DataFrame:
+def _load_price_volume_history(ticker: str) -> pd.DataFrame:
     """
     Has side effect of downloading the ticker if it can not be read locally
     :param ticker:
     :return: table indexed with date, two columns: 'Adj Close', 'Volume'
     """
-    filepath = price_vol_path(ticker)
+    filepath = _price_vol_path(ticker)
     if os.path.exists(filepath):
         price_volume_history = pd.read_csv(filepath,
                                            parse_dates=['Date'],
@@ -83,7 +83,7 @@ def load_price_volume_history(ticker: str) -> pd.DataFrame:
                                                   'Low': np.float64})
         return price_volume_history
     else:
-        price_volume_history = download_price_volume_history(ticker)
+        price_volume_history = _download_price_volume_history(ticker)
         price_volume_history.to_csv(filepath)
         return price_volume_history
 
@@ -96,7 +96,7 @@ def load_price_and_volume_histories(tickers: set[str]) -> tuple[pd.DataFrame, pd
     prices_history = pd.DataFrame()
     volume_history = pd.DataFrame()
     for ticker in tqdm.tqdm(tickers, desc='Loading price and volume'):
-        ticker_prices_vols = load_price_volume_history(ticker)
+        ticker_prices_vols = _load_price_volume_history(ticker)
         ticker_prices_df = ticker_prices_vols['Adj Close'].rename(ticker)
         ticker_vols_df = ticker_prices_vols['Volume'].rename(ticker)
         prices_history = prices_history.join(ticker_prices_df, how='outer')
@@ -146,7 +146,7 @@ def load_shares_history(tickers: set[str]) -> SharesHistory:
     return SharesHistory(prices_history_df, volumes_history_df, shares_outstanding)
 
 
-def download_info(tickers: list[str]) -> pd.DataFrame:
+def _download_info(tickers: list[str]) -> pd.DataFrame:
     """ downloads info for each ticker
     :param tickers:
     :return: DataFrame with columns 'ticker', 'sharesOutstanding', etc...

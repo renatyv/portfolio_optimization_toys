@@ -5,14 +5,14 @@ from typing import Callable
 import pandas as pd
 
 
-def clean_weights(portfolio_weights: SharesWeights, eps=0.0001) -> SharesWeights:
+def _clean_weights(portfolio_weights: SharesWeights, eps=0.0001) -> SharesWeights:
     return portfolio_weights[portfolio_weights > eps]
 
 
-def compute_rebalance_fees(old_shares: SharesNumber,
-                           new_shares: SharesNumber,
-                           prices: pd.Series,
-                           fees_percent: float) -> np.float64:
+def _compute_fees_for_rebalance(old_shares: SharesNumber,
+                                new_shares: SharesNumber,
+                                prices: pd.Series,
+                                fees_percent: float) -> np.float64:
     """
     Computes fees paid as a result of portfolio rebalance
     :param old_shares: pd.Series({'AMZN':12, 'GOOG':100})
@@ -24,10 +24,10 @@ def compute_rebalance_fees(old_shares: SharesNumber,
     return (old_shares.subtract(new_shares, fill_value=0.0).abs() * prices).sum() * fees_percent / 100.0
 
 
-def compute_rebalance_leftover(old_portfolio: Portfolio,
-                               rebalanced_shares: SharesNumber,
-                               latest_prices: pd.Series,
-                               fees_percent: np.float64) -> np.float64:
+def _compute_leftover_after_rebalance(old_portfolio: Portfolio,
+                                      rebalanced_shares: SharesNumber,
+                                      latest_prices: pd.Series,
+                                      fees_percent: np.float64) -> np.float64:
     """
     Computes leftover paid as a result of portfolio rebalance
     leftover after rebalance
@@ -39,14 +39,14 @@ def compute_rebalance_leftover(old_portfolio: Portfolio,
     """
     new_portfolio_value = shares_value(rebalanced_shares, latest_prices)
     old_portfolio_value: np.float64 = old_portfolio.value(latest_prices)
-    fees = compute_rebalance_fees(old_portfolio.shares, rebalanced_shares, latest_prices, fees_percent)
+    fees = _compute_fees_for_rebalance(old_portfolio.shares, rebalanced_shares, latest_prices, fees_percent)
     return old_portfolio_value - new_portfolio_value - fees
 
 
-def reduce_portfolio_until_leftover_positive(shares: SharesNumber,
-                                             latest_prices: pd.Series,
-                                             leftover_fn: Callable[[SharesNumber], np.float64],
-                                             fees_percent: float) -> SharesNumber:
+def _reduce_portfolio_until_leftover_positive(shares: SharesNumber,
+                                              latest_prices: pd.Series,
+                                              leftover_fn: Callable[[SharesNumber], np.float64],
+                                              fees_percent: float) -> SharesNumber:
     """
     if fees are too big, reduce amount of shares, starting from less weighty one
     :param shares: pd.Series({'AMZN':100, 'GOOG':100})
@@ -88,17 +88,17 @@ def reallocate_portfolio(old_portfolio: Portfolio,
     portfolio_value = old_portfolio.value(latest_prices)
     # portfolio_estimate: PortfolioShares = np.ceil(new_portfolio_weights * total_value / latest_prices)
     portfolio_estimate: SharesNumber = np.round(new_portfolio_weights * portfolio_value / latest_prices)
-    portfolio_estimate = clean_weights(portfolio_estimate)
-    leftover_fn = lambda portfolio: compute_rebalance_leftover(old_portfolio, portfolio, latest_prices, fees_percent)
-    reduced_portfolio = reduce_portfolio_until_leftover_positive(portfolio_estimate,
-                                                                 latest_prices,
-                                                                 leftover_fn,
-                                                                 fees_percent)
+    portfolio_estimate = _clean_weights(portfolio_estimate)
+    leftover_fn = lambda portfolio: _compute_leftover_after_rebalance(old_portfolio, portfolio, latest_prices, fees_percent)
+    reduced_portfolio = _reduce_portfolio_until_leftover_positive(portfolio_estimate,
+                                                                  latest_prices,
+                                                                  leftover_fn,
+                                                                  fees_percent)
     leftover = leftover_fn(reduced_portfolio)
-    fees = compute_rebalance_fees(old_portfolio.shares, reduced_portfolio, latest_prices, fees_percent)
+    fees = _compute_fees_for_rebalance(old_portfolio.shares, reduced_portfolio, latest_prices, fees_percent)
     assert fees >= 0
     assert leftover >= 0
-    return Portfolio(cash=leftover, shares=clean_weights(reduced_portfolio)), fees
+    return Portfolio(cash=leftover, shares=_clean_weights(reduced_portfolio)), fees
 
 
 def allocate_discrete(portfolio_weights: SharesWeights,

@@ -2,9 +2,7 @@ import numpy as np
 import pandas as pd
 
 import assets
-import pypoanal.rebalancer
-from pypoanal import rebalancer
-from pytest import approx
+from pypoanal import portfolio_rebalancer
 
 
 def test_portfolio_value_empty():
@@ -32,7 +30,7 @@ def test_reallocate_from_empty_portfolio_1():
     old_portfolio = assets.Portfolio(4000.0, pd.Series())
     portfolio_weights = pd.Series({'GOOG': 0.5, 'AMZN': 0.5})
     latest_prices = pd.Series({'GOOG': 2000.0, 'AMZN': 2000.0})
-    new_portfolio, accumulated_fees = pypoanal.rebalancer.reallocate_portfolio(old_portfolio,
+    new_portfolio, accumulated_fees = portfolio_rebalancer.reallocate_portfolio(old_portfolio,
                                                                                  portfolio_weights,
                                                                                  latest_prices,
                                                                                  fees_percent=0.0)
@@ -46,7 +44,7 @@ def test_reallocate_from_empty_portfolio_2():
     portfolio_weights = pd.Series({'GOOG': 0.5, 'AMZN': 0.5})
     latest_prices = pd.Series({'GOOG': 2000.0, 'AMZN': 2000.0})
     fees_p = 1.0
-    new_portfolio, accumulated_fees = pypoanal.rebalancer.reallocate_portfolio(old_portfolio,
+    new_portfolio, accumulated_fees = portfolio_rebalancer.reallocate_portfolio(old_portfolio,
                                                                                  portfolio_weights,
                                                                                  latest_prices,
                                                                                  fees_percent=fees_p)
@@ -60,7 +58,7 @@ def test_reallocate_portfolio_the_same():
     old_portfolio = assets.Portfolio(100.0, portfolio_shares)
     portfolio_weights = pd.Series({'GOOG': 0.4, 'AMZN': 0.6})
     latest_prices = pd.Series({'GOOG': 1000.0, 'AMZN': 2000.0})
-    new_portfolio, fees = pypoanal.rebalancer.reallocate_portfolio(old_portfolio,
+    new_portfolio, fees = portfolio_rebalancer.reallocate_portfolio(old_portfolio,
                                                                              portfolio_weights,
                                                                              latest_prices,
                                                                              fees_percent=1)
@@ -74,7 +72,7 @@ def test_reallocate_portfolio_1():
     old_portfolio = assets.Portfolio(cash, pd.Series({'GOOG': 1.0, 'AMZN': 1.0}))
     portfolio_weights = pd.Series({'GOOG': 0.4, 'AMZN': 0.6})
     latest_prices = pd.Series({'GOOG': 1000.0, 'AMZN': 2000.0})
-    new_portfolio, fees = pypoanal.rebalancer.reallocate_portfolio(old_portfolio,
+    new_portfolio, fees = portfolio_rebalancer.reallocate_portfolio(old_portfolio,
                                                                      portfolio_weights,
                                                                      latest_prices,
                                                                      fees_percent=1)
@@ -88,7 +86,7 @@ def test_reallocate_portfolio_2():
     old_portfolio = assets.Portfolio(cash, pd.Series({'GOOG': 1.0, 'AMZN': 2.0}))
     portfolio_weights = pd.Series({'GOOG': 2 / 3, 'AMZN': 1 / 3})
     latest_prices = pd.Series({'GOOG': 1000.0, 'AMZN': 1000.0})
-    new_portfolio, fees = pypoanal.rebalancer.reallocate_portfolio(old_portfolio,
+    new_portfolio, fees = portfolio_rebalancer.reallocate_portfolio(old_portfolio,
                                                                      portfolio_weights,
                                                                      latest_prices,
                                                                      fees_percent=1)
@@ -100,7 +98,7 @@ def test_reallocate_portfolio_2():
 def test_compute_rebalance_fees_equal():
     shares = pd.Series({'GOOG': 1.0, 'AMZN': 1.0})
     prices = pd.Series({'GOOG': 100.0, 'AMZN': 200.0})
-    fees = pypoanal.rebalancer.compute_rebalance_fees(shares, shares, prices, fees_percent=1.0)
+    fees = portfolio_rebalancer._compute_fees_for_rebalance(shares, shares, prices, fees_percent=1.0)
     assert fees == 0
 
 
@@ -108,23 +106,23 @@ def test_compute_rebalance_fees_1():
     old_shares = pd.Series({'GOOG': 1.0, 'AMZN': 1.0})
     new_shares = pd.Series({'GOOG': 0.0, 'AMZN': 0.0})
     prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0})
-    return np.float64(2.0) == pypoanal.rebalancer.compute_rebalance_fees(old_shares, new_shares, prices,
-                                                                         fees_percent=1.0)
+    return np.float64(2.0) == portfolio_rebalancer._compute_fees_for_rebalance(old_shares, new_shares, prices,
+                                                                              fees_percent=1.0)
 
 
 def test_compute_rebalance_fees_2():
     old_shares = pd.Series({'GOOG': 1.0, 'AMZN': 1.0})
     new_shares = pd.Series({'GOOG': 0.0, 'AAPL': 1.0})
     prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 100.0})
-    return np.float64(2.0) == pypoanal.rebalancer.compute_rebalance_fees(old_shares, new_shares, prices,
-                                                                         fees_percent=1.0)
+    return np.float64(2.0) == portfolio_rebalancer._compute_fees_for_rebalance(old_shares, new_shares, prices,
+                                                                              fees_percent=1.0)
 
 
 def test_compute_leftover_portfolios_equal():
     cash = 100.0
     old_portfolio = assets.Portfolio(cash,pd.Series({'GOOG': 1.0, 'AMZN': 1.0}))
     prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 100.0})
-    leftover = pypoanal.rebalancer.compute_rebalance_leftover(old_portfolio, old_portfolio.shares, prices, fees_percent=0.02)
+    leftover = portfolio_rebalancer._compute_leftover_after_rebalance(old_portfolio, old_portfolio.shares, prices, fees_percent=0.02)
     assert leftover == cash
 
 
@@ -133,7 +131,7 @@ def test_compute_leftover_portfolios_1():
                                      pd.Series({'GOOG': 1.0, 'AMZN': 1.0}))
     new_shares = pd.Series({'GOOG': 1.0, 'AAPL': 1.0})
     prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 100.0})
-    leftover = pypoanal.rebalancer.compute_rebalance_leftover(old_portfolio, new_shares, prices, fees_percent=1.0)
+    leftover = portfolio_rebalancer._compute_leftover_after_rebalance(old_portfolio, new_shares, prices, fees_percent=1.0)
     # sell AMZN and buy AAPL, fees = 2.0
     assert leftover == 100.0 - 2.0
 
@@ -143,7 +141,7 @@ def test_compute_leftover_portfolios_2():
                                      pd.Series({'GOOG': 1.0, 'AMZN': 1.0}))
     new_shares = pd.Series({'MSFT': 1.0, 'AAPL': 1.0})
     latest_prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 200.0, 'MSFT': 200.0})
-    leftover = pypoanal.rebalancer.compute_rebalance_leftover(old_portfolio, new_shares, latest_prices, fees_percent=1.0)
+    leftover = portfolio_rebalancer._compute_leftover_after_rebalance(old_portfolio, new_shares, latest_prices, fees_percent=1.0)
     fees = 2.0 + 4.0  # sell old and buy new portfolio
     assert leftover == -200.0 - fees
 
@@ -153,7 +151,7 @@ def test_allocate_discrete_1():
     latest_prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0})
     fees_percent = 0.0
     cash = 1000.0
-    portfolio, fees = pypoanal.rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
+    portfolio, fees = portfolio_rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
     assert portfolio.shares.to_dict() == {'GOOG': 5.0, 'AMZN': 5.0}
     assert portfolio.cash == 0.0
     assert fees == 0.0
@@ -164,7 +162,7 @@ def test_allocate_discrete_leftover():
     latest_prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0})
     fees_percent = 0.0
     cash = 205.0
-    portfolio, fees = pypoanal.rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
+    portfolio, fees = portfolio_rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
     assert portfolio.shares.to_dict() == {'GOOG': 1.0, 'AMZN': 1.0}
     assert portfolio.cash == 5.0
     assert fees == 0.0
@@ -176,7 +174,7 @@ def test_allocate_discrete_fees():
     latest_prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0})
     fees_percent = 1.0
     cash = 205
-    portfolio, fees = pypoanal.rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
+    portfolio, fees = portfolio_rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
     assert portfolio.shares.to_dict() == {'GOOG': 1.0, 'AMZN': 1.0}
     assert fees == 2.0
     assert portfolio.cash == 3.0
@@ -188,7 +186,7 @@ def test_allocate_discrete_2():
     latest_prices = pd.Series({'GOOG': 100.0, 'AMZN': 10.0})
     fees_percent = 1.0
     cash = 190.0
-    portfolio, fees = pypoanal.rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
+    portfolio, fees = portfolio_rebalancer.allocate_discrete(p_weights, latest_prices, cash, fees_percent)
     assert portfolio.shares.to_dict() == {'GOOG': 1.0, 'AMZN': 8.0}
     assert fees == 1.8
     assert portfolio.cash == 10.0 - 1.8
