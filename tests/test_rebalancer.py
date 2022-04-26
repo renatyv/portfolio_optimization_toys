@@ -112,8 +112,8 @@ def test_compute_rebalance_fees_1():
 
 def test_compute_rebalance_fees_2():
     old_shares = pd.Series({'GOOG': 1.0, 'AMZN': 1.0})
-    new_shares = pd.Series({'GOOG': 0.0, 'AAPL': 1.0})
-    prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 100.0})
+    new_shares = pd.Series({'AAPL': 1.0, 'GOOG': 0.0})
+    prices = pd.Series({'AAPL': 100.0, 'GOOG': 100.0, 'AMZN': 100.0})
     return np.float64(2.0) == portfolio_rebalancer._compute_fees_for_rebalance(old_shares, new_shares, prices,
                                                                               fees_percent=1.0)
 
@@ -121,8 +121,11 @@ def test_compute_rebalance_fees_2():
 def test_compute_leftover_portfolios_equal():
     cash = 100.0
     old_portfolio = assets.Portfolio(cash,pd.Series({'GOOG': 1.0, 'AMZN': 1.0}))
-    prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 100.0})
-    leftover = portfolio_rebalancer._compute_leftover_after_rebalance(old_portfolio, old_portfolio.shares, prices, fees_percent=0.02)
+    prices = pd.Series({'GOOG': 100.0, 'AMZN': 100.0, 'AAPL': 100.0, 'NOTATICKER': 4000})
+    leftover = portfolio_rebalancer._compute_leftover_after_rebalance(old_portfolio,
+                                                                      old_portfolio.shares,
+                                                                      prices,
+                                                                      fees_percent=0.02)
     assert leftover == cash
 
 

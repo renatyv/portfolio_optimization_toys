@@ -3,6 +3,7 @@ import numpy as np
 from pypoanal.assets import shares_value, Portfolio, SharesWeights, SharesNumber
 from typing import Callable
 import pandas as pd
+from loguru import logger
 
 
 def _clean_weights(portfolio_weights: SharesWeights, eps=0.0001) -> SharesWeights:
@@ -21,6 +22,8 @@ def _compute_fees_for_rebalance(old_shares: SharesNumber,
     :param fees_percent: 0.04
     :return: 0.1
     """
+    # pandas is aware of indexes.
+    # It will compute old_shares.subtract and '*' index-by-index, ignoring the actual order
     return (old_shares.subtract(new_shares, fill_value=0.0).abs() * prices).sum() * fees_percent / 100.0
 
 
@@ -75,6 +78,10 @@ def _reduce_portfolio_until_leftover_positive(shares: SharesNumber,
     return only_positive_shares
 
 
+class AllocationException(Exception):
+    pass
+
+
 def reallocate_portfolio(old_portfolio: Portfolio,
                          new_portfolio_weights: SharesWeights,
                          latest_prices: pd.Series,
@@ -96,8 +103,13 @@ def reallocate_portfolio(old_portfolio: Portfolio,
                                                                   fees_percent)
     leftover = leftover_fn(reduced_portfolio)
     fees = _compute_fees_for_rebalance(old_portfolio.shares, reduced_portfolio, latest_prices, fees_percent)
-    assert fees >= 0
-    assert leftover >= 0
+    if fees < 0 or leftover < 0:
+        logger.error('fees are negative')
+        logger.debug(f'fees: {fees} leftover: {leftover}')
+        logger.debug(f'Old portolio: {old_portfolio.shares.to_list()}')
+        logger.debug(f'New portolio: {new_portfolio_weights.to_list()}')
+        logger.debug(f'Prices: {latest_prices.to_list()}')
+        raise AllocationException('Smth gone wrong')
     return Portfolio(cash=leftover, shares=_clean_weights(reduced_portfolio)), fees
 
 
