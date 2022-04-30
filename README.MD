@@ -1,18 +1,34 @@
-# python notebooks and small library for basic analysis of stocks
+# Python notebooks and small library for basic analysis of stocks
 I want to choose good portolio from list of available shares.
 My requirements are:
 
-0. Download historical price and volume data
+0. I want to store price and volume history locally
 1. I do not want to re-allocate portfolio too often (at most 4 times a year)
-2. I want to backtest various portolio allocation strategies, i.e. test how they worked in the past.
+2. I want to backtest various portolio allocation strategies, i.e. test how they would have worked in the past.
 3. Fees need to be taken into account. Assume that fee is 0.02% for each operation (buy or sell)
 
-I found several ways to compose a portfolio:
+I found several ways to compose a portfolio using [pypfopt](https://github.com/robertmartin8/PyPortfolioOpt) package:
   * Markovitz optimal portfolio (max Sharpie portfolio)
   * Using Ledoit Wolf caovariance shrinkage
   * Minimal volatility portfolio
   * Market capitalization-weighted portfolio
   * Hierarchical Risk Parity
+
+## Requirements
+
+1. Install [poetry](https://python-poetry.org/docs/) dependency management system for python.
+2. I also prefer to have all dependencies locally in .venv directory.
+```
+poetry config virtualenvs.in-project true
+```
+3. Install all dependencies, see [pyptoject.toml](pyproject.toml)
+```
+poetry install
+```
+3. Start jupyter in correct environment
+```
+poetry run jupyter-lab
+```
 
 ## Example
 The following graphs were obtained using the [analyze_portfolios.ipynb](analyze_portfolios.ipynb).

@@ -12,3 +12,4 @@ __pycache__/
 /pypoanal/.ipynb_checkpoints
 .idea
 .ipynb_checkpoints
+poetry.lock
