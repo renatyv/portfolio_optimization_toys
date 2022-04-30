@@ -1,4 +1,3 @@
-import warnings
 from typing import Callable
 
 import numpy as np
@@ -35,12 +34,10 @@ def compute_equal_weights(shares_outstanding: pd.Series,
 def compute_mcap_weights(shares_outstanding: pd.Series,
                          price_history: pd.DataFrame) -> SharesWeights:
     """Allocate according to the market capitalization at the end of the period"""
-    if shares_outstanding.empty > 0:
-        warnings.warn(f'ticker_nshares is empty')
     latest_prices: pd.Series = price_history.fillna(method='ffill').iloc[-1]
     total_mcap = (latest_prices * shares_outstanding).sum()
     if total_mcap == 0:
-        return pd.Series()
+        return pd.Series(dtype=np.float64)
     weights = (latest_prices * shares_outstanding).dropna() / total_mcap
     return weights[weights > 0]
 

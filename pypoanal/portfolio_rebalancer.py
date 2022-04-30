@@ -96,13 +96,19 @@ def reallocate_portfolio(old_portfolio: Portfolio,
     # portfolio_estimate: PortfolioShares = np.ceil(new_portfolio_weights * total_value / latest_prices)
     portfolio_estimate: SharesNumber = np.round(new_portfolio_weights * portfolio_value / latest_prices)
     portfolio_estimate = _clean_weights(portfolio_estimate)
-    leftover_fn = lambda portfolio: _compute_leftover_after_rebalance(old_portfolio, portfolio, latest_prices, fees_percent)
+    leftover_fn = lambda portfolio: _compute_leftover_after_rebalance(old_portfolio,
+                                                                      portfolio,
+                                                                      latest_prices,
+                                                                      fees_percent)
     reduced_portfolio = _reduce_portfolio_until_leftover_positive(portfolio_estimate,
                                                                   latest_prices,
                                                                   leftover_fn,
                                                                   fees_percent)
     leftover = leftover_fn(reduced_portfolio)
-    fees = _compute_fees_for_rebalance(old_portfolio.shares, reduced_portfolio, latest_prices, fees_percent)
+    fees = _compute_fees_for_rebalance(old_portfolio.shares,
+                                       reduced_portfolio,
+                                       latest_prices,
+                                       fees_percent)
     if fees < 0 or leftover < 0:
         logger.error('fees are negative')
         logger.debug(f'fees: {fees} leftover: {leftover}')
@@ -121,7 +127,7 @@ def allocate_discrete(portfolio_weights: SharesWeights,
     allocates portfolio with integer values
     :return: Portfolio, fees
     """
-    return reallocate_portfolio(old_portfolio=Portfolio(cash, pd.Series()),
+    return reallocate_portfolio(old_portfolio=Portfolio(cash, pd.Series(dtype=np.float64)),
                                 new_portfolio_weights=portfolio_weights,
                                 latest_prices=latest_prices,
                                 fees_percent=fees_percent)

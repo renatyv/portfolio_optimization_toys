@@ -22,7 +22,7 @@ def shares_value(shares: SharesNumber, shares_prices: pd.Series) -> np.float64:
 @dataclass
 class Portfolio:
     cash: np.float64 = np.float64(0.0)
-    shares: SharesNumber = pd.Series()
+    shares: SharesNumber = pd.Series(dtype=np.float64)
 
     def value(self, shares_prices: pd.Series) -> np.float64:
         """
