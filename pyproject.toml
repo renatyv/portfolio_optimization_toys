@@ -5,7 +5,8 @@ description = "Studying portfolio optimization and applying it in practice"
 authors = ["Renat Yuldashev <renatyv@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<=3.11"
+python = ">3.8,<3.10"
+scipy = "^1.8.0"
 numpy = "^1.22.3"
 pandas = "^1.4.2"
 yahoo-fin = "^0.8.9"
@@ -17,6 +18,11 @@ pytest = "^7.1.2"
 cvxpy = "^1.2.0"
 hypothesis = "^6.45.1"
 loguru = "^0.6.0"
+jupyterlab = "^3.4.2"
+plotly = "^5.8.0"
+matplotlib = "^3.5.2"
+ipympl = "^0.9.1"
+flake8 = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 

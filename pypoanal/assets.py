@@ -19,6 +19,7 @@ def shares_value(shares: SharesNumber, shares_prices: pd.Series) -> np.float64:
     return (shares_prices * shares).sum()
 
 
+# slots are new in vertion 3.10
 @dataclass
 class Portfolio:
     cash: np.float64 = np.float64(0.0)
